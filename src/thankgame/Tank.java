@@ -2,7 +2,7 @@ package thankgame;
 
 public class Tank {
     /**
-     * role 电脑坦克
+     * role 坦克
      * version 1.0
      */
 
