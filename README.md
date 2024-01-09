@@ -13,7 +13,7 @@
 
 ## 游戏界面
 ### Java 绘图坐标体系
-![img.png](img.png)
+![img.png](pages/img.png)
 ### Java 绘图技术
 Component 类提供了两个和绘图相关的重要方法：
 
@@ -62,18 +62,25 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 
 事件：事件就是承载事件源状态改变时的对象，比如当键盘事件、鼠标事件、窗口事件等会产生一个事件对象，该对象保存着当前事件很多信息，比如 KeyEevent 对象有被按下键的 code 值。
 
+目前游戏中有两个事件：
+- `W A S D` 方向键控制玩家坦克的移动
+- `鼠标左键` 控制子弹的发射（视频教程中是 `J` 键）
+
+
 **java.awt.event 包 和 javax.swing.event 包中定义了各种事件类型。**
-![img_2.png](img_2.png)
+![img_2.png](pages/img_2.png)
 
 ## 游戏分解 N 个类
-`Tank` 类是 定义了坦克的相关属性（角色、方向、坦克的坐标）以及移动坦克的四个方法 `moveUp`、`moveDown`、`moveDown`、`moveLeft`、`moveRight`。
+`Tank` 类 定义了坦克的相关属性（角色、方向、坦克的坐标）以及移动坦克的四个方法 `moveUp`、`moveDown`、`moveDown`、`moveLeft`、`moveRight`。
 
 `Hero` 类继承了 Tank 类，相当于是玩家坦克。
 
 `MyPanel` 类继承了 JPanel 类以及 KeyListener 接口类，在此类中定义了画绘制坦克的方法 `DrawTank`, 监听按键并调用相应移动方法的`keyPressed`。
 
+`Shot` 类 定义了子弹的属性（横纵坐标、方向、速度）及方法，继承了 `Thread`，相当于是一个线程。
+
 `TankGame` 类则是程序的主类，完成程序初始化。
-在Swing中，任何其他组件都必须位于一个顶层容器中。JFrame 窗口和 JPanel 面板是常用的顶层容器
+在Swing中，任何其他组件都必须位于一个顶层容器中。JFrame 窗口和 JPanel 面板是常用的顶层容器。
 
 **坦克的绘制**
 

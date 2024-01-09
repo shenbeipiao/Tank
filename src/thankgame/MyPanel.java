@@ -4,13 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Vector;
 
 /**
  * version 1.0
  * 坦克大战的绘图区域
  */
-public class MyPanel extends JPanel implements KeyListener {
+public class MyPanel extends JPanel implements KeyListener , MouseListener, Runnable {
     // 定义玩家坦克
     Hero hero = null;
     // 电脑坦克 放入 Vector
@@ -39,6 +41,11 @@ public class MyPanel extends JPanel implements KeyListener {
         for(int i = 0; i < enemyTanks.size(); i++) {
             EnemyTank enemyTank = enemyTanks.get(i);
             drawTank(enemyTank.getX(),enemyTank.getY(),g,enemyTank.getDirect(),0);
+        }
+
+        // 子弹
+        if(hero.shot != null && hero.shot.isLive == true) {
+            g.draw3DRect(hero.shot.x,hero.shot.y,4,4,false);
         }
     }
 
@@ -118,11 +125,53 @@ public class MyPanel extends JPanel implements KeyListener {
             hero.setDirect(3);
             hero.moveLeft();
         }
+
         this.repaint();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // 射击
+        if(e.getButton() == MouseEvent.BUTTON1) { //左键
+            hero.shotEnemyTank();
+        }
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            this.repaint();
+        }
     }
 }
