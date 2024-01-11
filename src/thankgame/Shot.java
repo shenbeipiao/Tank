@@ -43,7 +43,7 @@ public class Shot extends Thread{
             }
             System.out.println("子弹移动了");
             //判断子弹位置，是否销毁
-            if(!(x >= 0 && x <= 1000 && y >=0 && y <= 750)) {
+            if(!(x >= 0 && x <= 1000 && y >=0 && y <= 750 && isLive)) {
                 isLive = false;
                 break;
             }
