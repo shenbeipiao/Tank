@@ -12,16 +12,16 @@ public class Tank {
 
     // 坦克移动方法
     public void moveUp() { //上
-        y -= 2;
+        y -= 20;
     }
     public void moveDown() { //下
-        y += 2;
+        y += 20;
     }
     public void moveLeft() { //左
-        x -= 2;
+        x -= 20;
     }
     public void moveRight() { //右
-        x += 2;
+        x += 20;
     }
 
     public int getDirect() {

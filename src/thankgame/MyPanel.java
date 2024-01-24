@@ -193,16 +193,26 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     public void keyPressed(KeyEvent e) { // 键盘控制方向  0--上--W  1--右--D 2--下--S 3--左--A
         if(e.getKeyCode() == KeyEvent.VK_W) { //上移动 W
             hero.setDirect(0);
-            hero.moveUp();
+            // 边界值
+            if(hero.getY() > 0) {
+                hero.moveUp();
+            }
         } else if (e.getKeyCode() == KeyEvent.VK_D) { //右移动 D
             hero.setDirect(1);
-            hero.moveRight();
+            if(hero.getX() + 80 < 1000) {
+                hero.moveRight();
+            }
         } else if (e.getKeyCode() == KeyEvent.VK_S) { //下移动 S
             hero.setDirect(2);
-            hero.moveDown();
+            if(hero.getY() < 640) {
+                hero.moveDown();
+                System.out.println(hero.getX() + "  " + hero.getY());
+            }
         } else if (e.getKeyCode() == KeyEvent.VK_A) { //左移动 A
             hero.setDirect(3);
-            hero.moveLeft();
+            if(hero.getX() > 0) {
+                hero.moveLeft();
+            }
         }
         this.repaint();
     }
