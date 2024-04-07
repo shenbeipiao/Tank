@@ -7,6 +7,7 @@ import java.util.Vector;
  */
 public class EnemyTank extends Tank implements Runnable{
     Vector<Shot> shots = new Vector<>();
+
     boolean isLive = true;
     public EnemyTank(int x, int y) {
         super(x, y);
@@ -16,6 +17,29 @@ public class EnemyTank extends Tank implements Runnable{
     @Override
     public void run() {
         while (true) {
+            //判断坦克是否有效 设置子弹颗数
+            if(isLive && shots.size() <= 10) {
+                Shot s = null;
+                //根据其方向 创建对应的子弹
+                switch(getDirect()) {
+                    case 0:
+                        s = new Shot(getX(), getY(),0);
+                        break;
+                    case 1:
+                        s = new Shot(getX(), getY(),1);
+                        break;
+                    case 2:
+                        s = new Shot(getX(), getY() ,2);
+                        break;
+                    case 3:
+                        s = new Shot(getX(), getY(),3);
+                        break;
+                }
+                shots.add(s);
+                // 启动
+                new Thread(s).start();
+
+            }
             // 根据坦克的方向 以一定的距离 来继续移动
             switch (getDirect()) {
                 case 0:
