@@ -76,9 +76,20 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
             }
         }
 
-        // 子弹
-        if(hero.shot != null && hero.shot.isLive == true) {
-            g.draw3DRect(hero.shot.x,hero.shot.y,4,4,false);
+        // 子弹 单颗
+       // if(hero.shot != null && hero.shot.isLive == true) {
+       //     g.draw3DRect(hero.shot.x,hero.shot.y,4,4,false);
+       // }
+
+        // 多颗子弹 遍历shots
+        for (int i = 0; i < hero.shots.size(); i++) {
+            Shot shot = hero.shots.get(i);
+            if(shot != null && shot.isLive == true) {
+                g.draw3DRect(shot.x,shot.y,4,4,false);
+            } else {
+                // 该shot对象无效 则从 shots 中 移除
+                hero.shots.remove(shot);
+            }
         }
 
         // 如果 bombs 集合中有对象就画出
@@ -221,6 +232,13 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     public void mouseClicked(MouseEvent e) {
         // 射击
         if(e.getButton() == MouseEvent.BUTTON1) { //左键
+
+            //  判断 玩家的子弹 是否销毁(单颗)
+            //if( hero.shot == null || !hero.shot.isLive) {
+            //    hero.shotEnemyTank();
+            //}
+
+            // 多颗不判断
             hero.shotEnemyTank();
         }
     }
@@ -250,23 +268,30 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
 
     }
 
+    // 判断子弹是否击中 进行重绘
+    public void hitEnnemyTank() {
+       for (int j = 0; j < hero.shots.size(); j++) {
+           Shot shot = hero.shots.get(j);
+           if(shot != null && shot.isLive) { // 子弹有效
+               //遍历敌人坦克
+               for(int i = 0; i < enemyTanks.size(); i++) {
+                   EnemyTank enemyTank = enemyTanks.get(i);
+                   hitTank(shot,enemyTank);
+               }
+           }
+       }
+    }
+
     @Override
     public void run() {
         while (true) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            // 判断子弹是否击中 进行重绘
-            if(hero.shot != null && hero.shot.isLive) { // 子弹有效
-                //遍历敌人坦克
-                for(int i = 0; i < enemyTanks.size(); i++) {
-                    EnemyTank enemyTank = enemyTanks.get(i);
-                    hitTank(hero.shot,enemyTank);
-                }
-            }
 
+            hitEnnemyTank();
             this.repaint();
         }
     }
