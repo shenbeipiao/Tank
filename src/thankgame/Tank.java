@@ -9,6 +9,7 @@ public class Tank {
     private int x; //坦克的横坐标
     private int y; //坦克的纵坐标
     private int direct; // 坦克的方向 0--上--W  1--右--D 2--下--S 3--左--A
+    boolean isLive = true; // 坦克是否存活
 
     // 坦克移动方法
     public void moveUp() { //上

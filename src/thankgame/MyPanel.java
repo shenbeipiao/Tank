@@ -52,7 +52,10 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
         g.fillRect(0,0,1000,750);// 填充矩形，默认黑色
 
         // 画出玩家坦克 将其封装为单独的方法
-        drawTank(hero.getX(), hero.getY(), g,hero.getDirect(),1);
+        if (hero != null && hero.isLive) {
+            drawTank(hero.getX(), hero.getY(), g,hero.getDirect(),1);
+        }
+
         // 画出电脑坦克 遍历Vector
         for(int i = 0; i < enemyTanks.size(); i++) {
             EnemyTank enemyTank = enemyTanks.get(i);
@@ -112,7 +115,6 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     }
 
     // 画出坦克
-
     /**
      *
      * @param x 坦克左上角的 x 坐标
@@ -168,7 +170,13 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     }
 
     // 判断我方坦克子弹是否击中敌方坦克
-    public void hitTank(Shot s, EnemyTank enemyTank) {
+
+    /**
+     *
+     * @param s 子弹
+     * @param enemyTank 坦克
+     */
+    public void hitTank(Shot s, Tank enemyTank) {
         switch (enemyTank.getDirect()) { //子弹方向
             case 0: // 上下
             case 2:
@@ -194,6 +202,25 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                 break;
         }
     }
+
+    // 判断敌方坦克子弹是否击中玩家坦克
+    public void hitHero() {
+        // 遍历敌人坦克
+        for (int i =0; i < enemyTanks.size(); i++) {
+            // 对单个坦克进行判断
+            EnemyTank enemyTank = enemyTanks.get(i);
+            // 对单个坦克的子弹进行判断
+            for (int j = 0; j < enemyTank.shots.size(); j++) {
+                Shot shot = enemyTank.shots.get(j);
+                // 判断子弹是否击中我方坦克
+                if (hero.isLive && shot.isLive) {
+                    hitTank(shot, hero);
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -291,7 +318,10 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                 throw new RuntimeException(e);
             }
 
+            // 判断玩家坦克子弹是否击中敌方坦克
             hitEnnemyTank();
+            // 判断敌方坦克是否击中玩家坦克
+            hitHero();
             this.repaint();
         }
     }
