@@ -34,15 +34,18 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
         //初始化电脑坦克
         for(int i = 0; i < enemyTanksSize; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (1 + i), 0);
+            // 赋值
+            enemyTank.setEnemyTanks(enemyTanks);
+            // 设置初始方向
             enemyTank.setDirect(2);
             // 启动
             new Thread(enemyTank).start();
             //给电脑坦克加子弹
             Shot shot = new Shot(enemyTank.getX(),enemyTank.getY(),enemyTank.getDirect());
             enemyTank.shots.add(shot);
-            new Thread(shot).start();
 
             enemyTanks.add(enemyTank);
+            new Thread(shot).start();
         }
     }
 
@@ -206,15 +209,18 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     // 判断敌方坦克子弹是否击中玩家坦克
     public void hitHero() {
         // 遍历敌人坦克
-        for (int i =0; i < enemyTanks.size(); i++) {
-            // 对单个坦克进行判断
-            EnemyTank enemyTank = enemyTanks.get(i);
-            // 对单个坦克的子弹进行判断
-            for (int j = 0; j < enemyTank.shots.size(); j++) {
-                Shot shot = enemyTank.shots.get(j);
-                // 判断子弹是否击中我方坦克
-                if (hero.isLive && shot.isLive) {
-                    hitTank(shot, hero);
+        if(enemyTanks.size() > 0) {
+            for (int i =0; i < enemyTanks.size(); i++) {
+                // 对单个坦克进行判断
+                EnemyTank enemyTank = enemyTanks.get(i);
+
+                // 对单个坦克的子弹进行判断
+                for (int j = 0; j < enemyTank.shots.size(); j++) {
+                    Shot shot = enemyTank.shots.get(j);
+                    // 判断子弹是否击中我方坦克
+                    if (hero.isLive && shot.isLive) {
+                        hitTank(shot, hero);
+                    }
                 }
             }
         }
@@ -296,7 +302,7 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     }
 
     // 判断子弹是否击中 进行重绘
-    public void hitEnnemyTank() {
+    public void hitEnemyTank() {
        for (int j = 0; j < hero.shots.size(); j++) {
            Shot shot = hero.shots.get(j);
            if(shot != null && shot.isLive) { // 子弹有效
@@ -319,7 +325,7 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
             }
 
             // 判断玩家坦克子弹是否击中敌方坦克
-            hitEnnemyTank();
+            hitEnemyTank();
             // 判断敌方坦克是否击中玩家坦克
             hitHero();
             this.repaint();
