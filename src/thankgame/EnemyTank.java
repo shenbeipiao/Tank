@@ -20,6 +20,25 @@ public class EnemyTank extends Tank implements Runnable{
     public void setEnemyTanks(Vector<EnemyTank> enemyTanks) {
         this.enemyTanks = enemyTanks;
     }
+    public Vector<Shot> getShots() {
+        return shots;
+    }
+
+    public void setShots(Vector<Shot> shots) {
+        this.shots = shots;
+    }
+
+    public Vector<EnemyTank> getEnemyTanks() {
+        return enemyTanks;
+    }
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public void setLive(boolean live) {
+        isLive = live;
+    }
 
     /**
      * @return true - 重叠或者碰撞  false - 未重叠或者碰撞

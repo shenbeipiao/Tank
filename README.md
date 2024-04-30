@@ -87,8 +87,8 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 **坦克的绘制**
 
 坦克模型图：
+![坦克模型.png](pages/坦克模型.png)
 
-![1714404708384](D:%5CJava%5CTank%5CTankGame%5C1714404708384.png)
 
 
 
@@ -170,6 +170,17 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 | 属性             | 含义                     | 方法       | 用途 |
 | ---------------- | ------------------------ | ---------- | ---- |
 | `int x ` `int y` | 炸弹的坐标               | 下方代码块 |      |
+
+
+
+### Recorder 类
+
+`Recorder` 类 ，记录玩家成绩，实现文件操作。
+
+- 该类记录我方击毁敌方坦克数
+- 当游戏结束，将击败数量写入到文件(myRecord.txt)
+- 退出游戏时，记录当前有效坦克的数据（方向和坐标）
+
 
 
 ### MyPanel类
@@ -354,7 +365,94 @@ public synchronized void m(String name) {
 
 ### 防止坦克重叠运动
 
-思路：判断坦克的定位坐标是否在一定范围内
+
+
+**思路：判断坦克的定位坐标是否在一定范围内** 
+
+![img3](pages/img_3.png)
+
+- 根据坦克运动方向确定坦克定位坐标
+  - 上   定位坐标（x,y）和（x+40,y）
+  - 下   定位坐标（x,y+60）和（x+40,y+60）
+  - 左   定位坐标（x,y）和（x,y+40）
+  - 右   定位坐标（x,y）和（x+40,y）
+- 坦克的每个方向都要和其他坦克四个方向（运动轨迹在一条直线上，所以两两一对）的坐标进行对比
+  - 上 
+    - 上下
+    - 左右
+  - 下
+    - 上下
+    - 左右
+  - 左   
+    - 上下
+    - 左右
+  - 右   
+    - 上下
+    - 左右
+
+参考代码：
+
+~~~java
+case 0: // 上
+// 与其他敌人坦克进行比较
+for(int i = 0; i < enemyTanks.size(); i++) {
+    EnemyTank enemyTank = enemyTanks.get(i);
+    // 不和自己比较
+    if(enemyTank != this) {
+        /**
+         * 敌人坦克方向   上下
+         * 定位坐标 确定坦克范围 x:[enemyTank.getX(),enemyTank.getX() + 40]
+         *                    y:[enemyTank.getY(),enemyTank.getY() + 60]
+         * 当前坦克的左右上角坐标与之进行比较
+         * 左上角坐标 [this.getX(), this.getY()]
+         * 右上角坐标 [this.getX() +40, this.getY()]
+         */
+        if(enemyTank.getDirect() == 0 || enemyTank.getDirect() == 2) {
+            // 比较左上角坐标 [this.getX(), this.getY()]
+            if(this.getX() >= enemyTank.getX() 
+               && this.getX() <= enemyTank.getX() + 40
+               && this.getY() >= enemyTank.getY() 
+               && this.getY() <= enemyTank.getY() + 60) {
+                return true;
+            }
+            // 比较右上角坐标 [this.getX() +40, this.getY()]
+            if(this.getX() + 40 >= enemyTank.getX() 
+               && this.getX() + 40 <= enemyTank.getX() + 40
+               && this.getY() >= enemyTank.getY() 
+               && this.getY() <= enemyTank.getY() + 60) {
+                return true;
+            }
+        }
+        /**
+         * 敌人坦克方向   左右
+         * 定位坐标 确定坦克范围 x:[enemyTank.getX(),enemyTank.getX() + 60]
+         *                    y:[enemyTank.getY(),enemyTank.getY() + 40]
+         * 当前坦克的左右上角坐标与之进行比较
+         * 左上角坐标 [this.getX(), this.getY()]
+         * 右上角坐标 [this.getX() +40, this.getY()]
+         */
+        if(enemyTank.getDirect() == 1 || enemyTank.getDirect() == 3) {
+            // 比较左上角坐标 [this.getX(), this.getY()]
+            if(this.getX() >= enemyTank.getX() 
+               && this.getX() <= enemyTank.getX() + 60
+               && this.getY() >= enemyTank.getY() 
+               && this.getY() <= enemyTank.getY() + 40) {
+                return true;
+            }
+            // 比较右上角坐标 [this.getX() +40, this.getY()]
+            if(this.getX() + 40 >= enemyTank.getX() 
+               && this.getX() + 40 <= enemyTank.getX() + 60
+               && this.getY() >= enemyTank.getY() 
+               && this.getY() <= enemyTank.getY() + 40) {
+                return true;
+            }
+        }
+    }
+}
+break;
+~~~
+
+
 
 
 

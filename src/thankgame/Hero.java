@@ -13,6 +13,10 @@ public class Hero extends Tank{
         super(x, y);
     }
 
+    public Vector<Shot> getShots() {
+        return shots;
+    }
+
     public void shotEnemyTank() {
         //控制子弹的颗数
         if (shots.size() == 5) {
