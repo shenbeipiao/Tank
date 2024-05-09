@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 public class Bomb {
     int x, y; // 炸弹的坐标

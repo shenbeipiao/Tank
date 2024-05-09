@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +13,7 @@ import java.util.Vector;
  * version 1.0
  * 坦克大战的绘图区域
  */
+@SuppressWarnings("all")
 public class MyPanel extends JPanel implements KeyListener , MouseListener, Runnable {
     // 定义玩家坦克
     Hero hero = null;
@@ -29,19 +30,21 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
     Image image1 = Toolkit.getDefaultToolkit().getImage("TankGame/pages/tank1.png");
     Image image2 = Toolkit.getDefaultToolkit().getImage("TankGame/pages/tank2.png");
 
-
     public MyPanel(String key) {
-        File file = new File(Recorder.getRecordFile());
-        if(file.exists()){
-            nodes = Recorder.getNodeAndEnemyTankRec();
-        }else{
-            System.out.println("文件不存在,只能开启新游戏");
-            key = "1";
+        File file =new File(Recorder.getRecordFile());
+        if(file.exists()) {
+            nodes=Recorder.getNodeAndEnemyTankRec();
+        }else {
+            System.out.println("只能开启新游戏");
+            key="1";
         }
+        System.out.println(nodes);
         //记录文件获取敌人坦克
         Recorder.setEnemyTanks(enemyTanks);
 
+        // 初始化玩家坦克
         hero = new Hero(100,100);
+        hero.setDirect(2);
 
        switch (key) {
            // 新游戏
@@ -71,7 +74,7 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                for(int i = 0; i < nodes.size(); i++) {
                    Node node = nodes.get(i);
                    EnemyTank enemyTank = new EnemyTank(node.getX(),node.getY());
-
+                   System.out.println(enemyTank);
                    // 创建坦克
                    enemyTank.setEnemyTanks(enemyTanks);
                    // 设置初始方向
@@ -90,6 +93,8 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
            default:
                System.out.println("输入有误");
        }
+        // 音乐
+        new AePlayWave("TankGame/pages/Tank01.wav").start();
     }
 
     public void showInfo(Graphics g) {
@@ -131,6 +136,12 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
             }
         }
 
+        // 第一个爆炸效果不显示
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         // 如果 bombs 集合中有对象就画出
         for (int i = 0; i < bombs.size(); i++) {
             Bomb bomb = bombs.get(i);
@@ -251,6 +262,9 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                     // 击败坦克数加一
                     enemyTanks.remove(enemyTank);
                     Recorder.addAllEnemyTankNum();
+                  } else { // 我方坦克被击中 退出游戏
+                      Recorder.keepRecord();
+                      System.exit(0);
                   }
                   Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());
                   bombs.add(bomb);
@@ -268,6 +282,9 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                         // 击败坦克数加一
                         enemyTanks.remove(enemyTank);
                         Recorder.addAllEnemyTankNum();
+                    } else { // 我方坦克被击中 退出游戏
+                        Recorder.keepRecord();
+                        System.exit(0);
                     }
                     Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());
                     bombs.add(bomb);

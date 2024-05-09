@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 /**
  * 坦克子弹类

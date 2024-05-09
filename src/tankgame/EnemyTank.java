@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 import java.util.Vector;
 
@@ -19,9 +19,6 @@ public class EnemyTank extends Tank implements Runnable{
     // 设置到 EnemyTank 的成员 enemyTanks
     public void setEnemyTanks(Vector<EnemyTank> enemyTanks) {
         this.enemyTanks = enemyTanks;
-    }
-    public Vector<Shot> getShots() {
-        return shots;
     }
 
     public void setShots(Vector<Shot> shots) {

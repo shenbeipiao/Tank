@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;

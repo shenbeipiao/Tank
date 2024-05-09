@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 // 一个 Node 对象就是 一个敌人坦克
 public class Node {

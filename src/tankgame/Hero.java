@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 import java.util.Vector;
 

@@ -1,4 +1,4 @@
-package thankgame;
+package tankgame;
 
 public class Tank {
     /**
