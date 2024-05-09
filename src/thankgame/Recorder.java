@@ -97,4 +97,7 @@ public class Recorder {
         }
     }
 
+    public static String getRecordFile() {
+        return recordFile;
+    }
 }

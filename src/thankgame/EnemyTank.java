@@ -328,7 +328,7 @@ public class EnemyTank extends Tank implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            // 然后随机的改变方向
+            // 然后随机改变方向
             setDirect((int)(Math.random() * 4));
             if(!isLive) {
                 break;

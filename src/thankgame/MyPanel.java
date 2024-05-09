@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.Vector;
 
 /**
@@ -30,7 +31,13 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
 
 
     public MyPanel(String key) {
-        nodes = Recorder.getNodeAndEnemyTankRec();
+        File file = new File(Recorder.getRecordFile());
+        if(file.exists()){
+            nodes = Recorder.getNodeAndEnemyTankRec();
+        }else{
+            System.out.println("文件不存在,只能开启新游戏");
+            key = "1";
+        }
         //记录文件获取敌人坦克
         Recorder.setEnemyTanks(enemyTanks);
 
@@ -43,15 +50,15 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                for(int i = 0; i < enemyTanksSize; i++) {
                    EnemyTank enemyTank = new EnemyTank(100 * (1 + i), 0);
 
+                   // 创建坦克
+                   enemyTank.setEnemyTanks(enemyTanks);
                    // 设置初始方向
                    enemyTank.setDirect(2);
                    // 启动
                    new Thread(enemyTank).start();
                    //给电脑坦克加子弹
                    Shot shot = new Shot(enemyTank.getX(),enemyTank.getY(),enemyTank.getDirect());
-                   enemyTank.getShots().add(shot);
-                   // 赋值
-                   enemyTank.setEnemyTanks(enemyTanks);
+                   enemyTank.shots.add(shot);
 
                    new Thread(shot).start();
                    enemyTanks.add(enemyTank);
@@ -65,21 +72,23 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                    Node node = nodes.get(i);
                    EnemyTank enemyTank = new EnemyTank(node.getX(),node.getY());
 
+                   // 创建坦克
+                   enemyTank.setEnemyTanks(enemyTanks);
                    // 设置初始方向
                    enemyTank.setDirect(node.getDirect());
                    // 启动
                    new Thread(enemyTank).start();
                    //给电脑坦克加子弹
                    Shot shot = new Shot(enemyTank.getX(),enemyTank.getY(),enemyTank.getDirect());
-                   enemyTank.getShots().add(shot);
-                   // 赋值
-                   enemyTank.setEnemyTanks(enemyTanks);
+                   enemyTank.shots.add(shot);
 
                    new Thread(shot).start();
                    enemyTanks.add(enemyTank);
 
                }
                break;
+           default:
+               System.out.println("输入有误");
        }
     }
 
@@ -122,30 +131,6 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
             }
         }
 
-
-        // 画出电脑坦克 遍历Vector
-        for(int i = 0; i < enemyTanks.size(); i++) {
-            EnemyTank enemyTank = enemyTanks.get(i);
-            if(enemyTank.isLive) { // 坦克存活
-                drawTank(enemyTank.getX(),enemyTank.getY(),g,enemyTank.getDirect(),0);
-
-                Vector<Shot> shots = enemyTank.getShots();
-                // 画出敌方坦克子弹
-                for(int j = 0; j < enemyTank.shots.size(); j++) {
-                    // 取出子弹
-                    Shot shot = shots.get(j);
-                    // 绘制子弹
-                    if(shot.isLive) {
-                        g.draw3DRect(shot.x + 18, shot.y + 18, 4,4,false);
-                    } else { //移除子弹
-                        enemyTank.getShots().remove(shot);
-                    }
-                }
-            } else {
-                enemyTanks.remove(enemyTank);
-            }
-        }
-
         // 如果 bombs 集合中有对象就画出
         for (int i = 0; i < bombs.size(); i++) {
             Bomb bomb = bombs.get(i);
@@ -163,6 +148,31 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                 bombs.remove(bomb);
             }
         }
+
+        // 画出电脑坦克 遍历Vector
+        for(int i = 0; i < enemyTanks.size(); i++) {
+            EnemyTank enemyTank = enemyTanks.get(i);
+            if(enemyTank.isLive) { // 坦克存活
+                drawTank(enemyTank.getX(),enemyTank.getY(),g,enemyTank.getDirect(),0);
+
+                //Vector<Shot> shots = enemyTank.getShots();
+                // 画出敌方坦克子弹
+                for(int j = 0; j < enemyTank.shots.size(); j++) {
+                    // 取出子弹
+                    Shot shot = enemyTank.shots.get(j);
+                    // 绘制子弹
+                    if(shot.isLive) {
+                        g.draw3DRect(shot.x + 18, shot.y + 18, 4,4,false);
+                    } else { //移除子弹
+                        enemyTank.shots.remove(shot);
+                    }
+                }
+            } else {
+                enemyTanks.remove(enemyTank);
+            }
+        }
+
+
     }
 
     // 画出坦克
@@ -235,10 +245,11 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                         && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60) {
                   s.isLive = false;
                   enemyTank.isLive = false;
-                  enemyTanks.remove(enemyTank);
+
                   // 判断坦克类型 玩家还是敌方坦克
                   if (enemyTank instanceof EnemyTank) {
                     // 击败坦克数加一
+                    enemyTanks.remove(enemyTank);
                     Recorder.addAllEnemyTankNum();
                   }
                   Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());
@@ -251,10 +262,11 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
                         && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40) {
                     s.isLive = false;
                     enemyTank.isLive = false;
-                    enemyTanks.remove(enemyTank);
+
                     // 判断坦克类型 玩家还是敌方坦克
                     if (enemyTank instanceof EnemyTank) {
                         // 击败坦克数加一
+                        enemyTanks.remove(enemyTank);
                         Recorder.addAllEnemyTankNum();
                     }
                     Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());

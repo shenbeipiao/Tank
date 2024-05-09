@@ -15,10 +15,11 @@ public class TankGame01 extends JFrame {
 
     public TankGame01() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("选择新一局游戏请输入 1");
-        System.out.println("选择上一局游戏请输入 2");
+        System.out.println("请输入你的选择： 1. 新游戏   2.上一局游戏");
         String key = scanner.next();
         mp = new MyPanel(key);
+        scanner.close();
+
         Thread thread = new Thread(mp);
         thread.start();
         this.add(mp);
