@@ -136,7 +136,7 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
             }
         }
 
-        // 第一个爆炸效果不显示
+        // 第一个爆炸效果不显示 控制显示
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {

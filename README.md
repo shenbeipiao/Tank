@@ -124,7 +124,6 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 | `int x`   `int y` | 坦克的横纵坐标               | `moveUp`                       | 向上移动 |
 | `int direct`      | 坦克的方向（发射子弹）       | `moveDown`                     | 向下移动 |
 | `boolean isLive`  | 坦克是否存活（会被子弹击中） | `moveLeft`                     | 向左移动 |
-|                   |                              | `moveRight`                    | 向右移动 |
 
 
 
@@ -167,9 +166,21 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 
 `Bomb` 类 ，实现坦克被击中后的爆炸效果，一共由三张图片组成。
 
-| 属性             | 含义                     | 方法       | 用途 |
-| ---------------- | ------------------------ | ---------- | ---- |
-| `int x ` `int y` | 炸弹的坐标               | 下方代码块 |      |
+| 属性             | 含义         | 方法       | 用途       |
+| ---------------- | ------------ | ---------- | ---------- |
+| `int x ` `int y` | 炸弹的坐标   | `lifeDown` | 控制生命值 |
+| `boolean isLive` | 炸弹是否有效 |            |            |
+| `int life`       | 坦克的生命值 |            |            |
+
+
+
+### AePlayWave 类
+
+`AePlayWave ` 类 ，控制游戏音频的播放，音频格式为 `.wav` 。
+
+| 属性              | 含义         |
+| ----------------- | ------------ |
+| `String filePath` | 音频文件路径 |
 
 
 
@@ -458,25 +469,242 @@ break;
 
 ### 记录玩家成绩  保存退出游戏
 
+记录玩家成绩是在文件上操作的，通过 `Recorder` 类中的操作文件的方法进行存储坦克的数据：坐标以及方向和子弹
 
+~~~java
+public class Recorder {
+    // 定义变量 记录击败坦克数
+    private static int allEnemyTankNum = 0;
+    // 定义 IO 对象，将数据写到文件中去
+    private static FileWriter fw = null;
+    private static BufferedWriter bw = null;
+    private static BufferedReader br = null;
+
+    // 文件位置 自定义
+    private static String recordFile = "d:\\myRecord.txt";
+
+    //定义一个 Node 的 Vector  用于保存敌人坦克信息
+    private static Vector<Node> nodes = new Vector<>();
+
+    // 定义 Vector 指向 MyPanel 对象的敌人坦克 Vector
+    private static Vector<EnemyTank> enemyTanks = null;
+
+    public static void setEnemyTanks(Vector<EnemyTank> enemyTanks) {
+        Recorder.enemyTanks = enemyTanks;
+    }
+
+    public static int getAllEnemyTankNum() {
+        return allEnemyTankNum;
+    }
+
+    public static void setAllEnemyTankNum(int allEnemyTankNum) {
+        Recorder.allEnemyTankNum = allEnemyTankNum;
+    }
+
+    // 当我方击毁一个敌方坦克时击败坦克数加一
+    public static void addAllEnemyTankNum() {
+        Recorder.allEnemyTankNum++;
+    }
+
+    // 读取 recordFile 文件信息 恢复数据
+    public static Vector<Node> getNodeAndEnemyTankRec() {
+        try {
+            br = new BufferedReader(new FileReader(recordFile));
+            allEnemyTankNum = Integer.parseInt(br.readLine());
+            // 循环读取数据 恢复有效坦克数据
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                String[] xyd = line.split(" ");
+                 Node node = new Node(Integer.parseInt(xyd[0]),Integer.parseInt(xyd[0]),Integer.parseInt(xyd[0]));
+                 nodes.add(node);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        return nodes;
+    }
+
+    // 当游戏退出时 保存信息
+    public static void keepRecord() {
+        try {
+            bw = new BufferedWriter(new FileWriter(recordFile));
+            bw.write(allEnemyTankNum + "\r\n");
+            // 遍历敌人坦克的 Vector ，保存坐标和方向
+            for (int i = 0; i < enemyTanks.size(); i++) {
+                // 取出坦克
+                EnemyTank enemyTank = enemyTanks.get(i);
+                // 判断有效性
+                if(enemyTank.isLive) {
+                    String record = enemyTank.getX() + " " + enemyTank.getY() + " " + enemyTank.getDirect();
+                    // 写入到文件
+                    bw.write(record + "\r\n");
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    public static String getRecordFile() {
+        return recordFile;
+    }
+}
+~~~
 
 
 
 ### 存档游戏 or 新游戏
 
+上一局游戏和新游戏此处实现的是控制台输入数字进行对应的初始化，涉及到的是 `I/O` 流的知识
+
+- `1`  新一局游戏
+  - 正常初始化页面
+- `2`  上一局游戏
+  - 先判断 存储信息的文件是否存在 存在则读取数据  不存在则提示新开一局游戏
+  - 需要从 `myRecord` 文件中读取敌方坦克的数据 然后绘图
+- 退出游戏
+  - 主动退出   玩家主动关闭游戏窗口 保存信息
+  - 被动退出   玩家坦克被击中 保存击败数 不保存敌方坦克信息  下一次游戏只能新开一局
+
+~~~java
+Scanner scanner = new Scanner(System.in);
+System.out.println("请输入你的选择： 1. 新游戏   2.上一局游戏");
+String key = scanner.next();
+mp = new MyPanel(key);
+~~~
+
+~~~java
+//  MyPanel 方法
+public MyPanel(String key) {
+    File file =new File(Recorder.getRecordFile());
+    if(file.exists()) {
+        nodes=Recorder.getNodeAndEnemyTankRec();
+    }else {
+        System.out.println("只能开启新游戏");
+        key="1";
+    }
+    System.out.println(nodes);
+    //记录文件获取敌人坦克
+    Recorder.setEnemyTanks(enemyTanks);
+
+    // 初始化玩家坦克
+    hero = new Hero(100,100);
+    hero.setDirect(2);
+
+    switch (key) {
+            // 新游戏
+        case "1" :
+            //初始化电脑坦克
+            for(int i = 0; i < enemyTanksSize; i++) {
+                EnemyTank enemyTank = new EnemyTank(100 * (1 + i), 0);
+
+                // 创建坦克
+                enemyTank.setEnemyTanks(enemyTanks);
+                // 设置初始方向
+                enemyTank.setDirect(2);
+                // 启动
+                new Thread(enemyTank).start();
+                //给电脑坦克加子弹
+                Shot shot = new Shot(enemyTank.getX(),enemyTank.getY(),enemyTank.getDirect());
+                enemyTank.shots.add(shot);
+
+                new Thread(shot).start();
+                enemyTanks.add(enemyTank);
+
+            }
+            break;
+            // 上局游戏
+        case "2" :
+            //初始化电脑坦克
+            for(int i = 0; i < nodes.size(); i++) {
+                Node node = nodes.get(i);
+                EnemyTank enemyTank = new EnemyTank(node.getX(),node.getY());
+                System.out.println(enemyTank);
+                // 创建坦克
+                enemyTank.setEnemyTanks(enemyTanks);
+                // 设置初始方向
+                enemyTank.setDirect(node.getDirect());
+                // 启动
+                new Thread(enemyTank).start();
+                //给电脑坦克加子弹
+                Shot shot = new Shot(enemyTank.getX(),enemyTank.getY(),enemyTank.getDirect());
+                enemyTank.shots.add(shot);
+
+                new Thread(shot).start();
+                enemyTanks.add(enemyTank);
+
+            }
+            break;
+        default:
+            System.out.println("输入有误");
+    }
+    // 音乐
+    new AePlayWave("TankGame/pages/Tank01.wav").start();
+}
+~~~
 
 
 
 
-## 问题解决
 
-### 敌方坦克 发射两颗子弹
+### 音频播放
+
+音频的播放依然是读取音频文件播放
+
+- 由于视频里的音频时间较短 我将其作为背景音乐进行循环播放
+
+  ~~~java
+  // 循环播放
+  File soundFile = new File(filename);
+  
+          AudioInputStream audioInputStream = null;
+          try {
+              audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+              //循环播放背景音乐
+              Clip clip = AudioSystem.getClip();
+              clip.open(audioInputStream);
+              clip.start();
+              clip.loop(Clip.LOOP_CONTINUOUSLY);
+          } catch (Exception e1) {
+              e1.printStackTrace();
+              return;
+          }
+  ~~~
 
 
 
-### 我方坦克在敌方坦克左右方向移动时发射子弹击中后无爆炸效果
 
 
+## 待改进的地方
 
+- **游戏窗口**
+  - 游戏选择新游戏还是上一局游戏可以在击败数下方控制输出或者新的窗口进行输入
+  - 在击败数 下方可以添加一个 开始暂停游戏
+  - 敌方坦克被全部击败完时弹出通关或其他信息窗口  用户选择是否开始新游戏
+  - 玩家坦克被击败时弹出游戏失败的窗口  选择是否继续游戏
 
+- **音频**
+  - 游戏发射子弹时可以添加音效
+  - 坦克被击毁时添加音效
+- **游戏对局**
+  - `Recorder` 类可以更改为记录玩家坦克信息，这样选择上一局游戏时可以完全复现对局
 
+这几个地方等我再学习一段时间后再进行完善，大概思路是这样，都是在此基础上进行扩充改变的。
