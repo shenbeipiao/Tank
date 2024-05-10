@@ -42,7 +42,7 @@ public class MyPanel extends JPanel implements KeyListener , MouseListener, Runn
         Recorder.setEnemyTanks(enemyTanks);
 
         // 初始化玩家坦克
-        hero = new Hero(100,100);
+        hero = new Hero(400,400);
         hero.setDirect(2);
 
        switch (key) {

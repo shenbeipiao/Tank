@@ -1,10 +1,15 @@
 # 坦克大战
-这是我在学习 Java 基础时第一个较为正式的项目（**跟做**），只使用基础的 Java 知识，视频教程是 ：【【零基础 快速学Java】韩顺平 零基础30天学会Java】 https://www.bilibili.com/video/BV1fh411y7R8/?share_source=copy_web&vd_source=57b5284b7f71eaf337f0c159cae09c41
+ 🚀 这是我在学习 Java 基础时第一个较为正式的项目（**跟做**），只使用基础的 Java 知识，视频教程是 ：【【零基础 快速学Java】韩顺平 零基础30天学会Java】 https://www.bilibili.com/video/BV1fh411y7R8/?share_source=copy_web&vd_source=57b5284b7f71eaf337f0c159cae09c41
 
 这个项目是从头开始将代码放在 Github 仓库的，我通过 Git 来进行代码提交更新，在学习巩固 Java 基础的同时实践 Git 的相关操作。
 
 虽然是跟做，但也是收获颇多，总结了一份不正式的开发文档（开发过程的总结）。
 如有需要，可做参考。
+
+## 效果图
+
+![效果图](pages/效果图.png)
+
 ## 开发涉及到的知识点（基础）
 - Java 面向对象编程
 - 多线程
@@ -70,7 +75,7 @@ java 事件处理是采取 “**委派事件模型**” 。当 事件发生时�
 **java.awt.event 包 和 javax.swing.event 包中定义了各种事件类型。**
 ![img_2.png](pages/img_2.png)
 
-## 游戏分解 N 个类
+## 游戏分解 9 个类
 `Tank` 类 定义了坦克的相关属性（角色、方向、坦克的坐标）以及移动坦克的四个方法 `moveUp`、`moveDown`、`moveDown`、`moveLeft`、`moveRight`。
 
 `Hero` 类继承了 Tank 类，相当于是玩家坦克。
